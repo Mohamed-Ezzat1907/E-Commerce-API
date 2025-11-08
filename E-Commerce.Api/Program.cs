@@ -1,4 +1,7 @@
 
+using E_Commerce.Persistence.Data.DBContexts;
+using Microsoft.EntityFrameworkCore;
+
 namespace E_Commerce.Api
 {
     public class Program
@@ -7,11 +10,19 @@ namespace E_Commerce.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            #region Services Configurations - Dependency injection
+
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddDbContext<StoreDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(); 
+
+            #endregion
 
             var app = builder.Build();
 
