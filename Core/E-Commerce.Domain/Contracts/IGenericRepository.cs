@@ -10,6 +10,16 @@ namespace E_Commerce.Domain.Contracts
         // Get Entity By Id
         Task<TEntity?> GetByIdAsync(TKey id);
 
+        #region Specifications
+
+        // Get Entities By Specification
+        Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity , TKey> specification);
+
+        // Get Single Entity By Specification
+        Task<TEntity?> GetByIdAsync(ISpecifications<TEntity , TKey> specification);
+
+        #endregion
+
         // Add New Entity
         Task AddAsync(TEntity entity);
 
