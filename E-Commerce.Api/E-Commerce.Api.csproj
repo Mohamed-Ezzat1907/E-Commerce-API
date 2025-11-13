@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Infrastructure\E-Commerce.Presentations\E-Commerce.Presentations.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
 </Project>
