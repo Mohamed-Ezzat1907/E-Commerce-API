@@ -4,8 +4,8 @@ using System.Linq.Expressions;
 
 namespace E_Commerce.Services.Specifications
 {
-    internal abstract class BaseSpecifications<TEntity, TKet> 
-        : ISpecifications<TEntity, TKet> where TEntity : BaseEntity<TKet>
+    internal abstract class BaseSpecifications<TEntity, TKey> 
+        : ISpecifications<TEntity, TKey> where TEntity : BaseEntity<TKey>
     {
         protected BaseSpecifications(Expression<Func<TEntity, bool>>? criteria)
         {
@@ -13,7 +13,7 @@ namespace E_Commerce.Services.Specifications
         }
         public Expression<Func<TEntity, bool>>? Criteria { get; private set; }
 
-        public List<Expression<Func<TEntity, object>>> IncludeExpressions => new ();
+        public List<Expression<Func<TEntity, object>>> IncludeExpressions { get; } = new ();
 
         protected void AddInclude(Expression<Func<TEntity, object>> includeExpression)
             => IncludeExpressions.Add(includeExpression);
