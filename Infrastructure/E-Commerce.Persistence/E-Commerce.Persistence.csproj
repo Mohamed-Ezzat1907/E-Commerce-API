@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\Core\E-Commerce.Services\E-Commerce.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Seedings\" />
+  </ItemGroup>
+
 </Project>
