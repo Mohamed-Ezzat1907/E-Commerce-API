@@ -1,12 +1,16 @@
 
+using E_Commerce.Domain.Contracts;
+using E_Commerce.Persistence.Data;
 using E_Commerce.Persistence.Data.DBContexts;
+using E_Commerce.Persistence.Repositories;
+using E_Commerce.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,9 @@ namespace E_Commerce.Api
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddScoped<IDbInititlaeizer, DbInititlaeizer>();
+            builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+            builder.Services.AddAutoMapper(o => { } , typeof(AssemblyReference).Assembly);
             builder.Services.AddDbContext<StoreDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -25,6 +32,10 @@ namespace E_Commerce.Api
             #endregion
 
             var app = builder.Build();
+
+            await InitializeDbAsync(app);
+
+            #region Middle Wares
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -37,9 +48,23 @@ namespace E_Commerce.Api
             app.UseAuthorization();
 
 
-            app.MapControllers();
+            app.MapControllers(); 
+
+            #endregion
 
             app.Run();
+
+            #region Methods
+
+            async Task InitializeDbAsync(WebApplication app) 
+            {
+                // Create Object From Type That Implement IDbInititlaeizer
+                using var scope = app.Services.CreateScope();
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInititlaeizer>();
+                await dbInitializer.InitializeAsync();
+            }
+
+            #endregion
         }
     }
 }
