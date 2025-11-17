@@ -20,7 +20,18 @@ namespace E_Commerce.Persistence
                 query = specifications.IncludeExpressions.Aggregate(
                     query, (currentQuery, includeExpression) => currentQuery.Include(includeExpression));
             }
+
+            // Sorting
+            if (specifications.OrderBy is not null)
+                query = query.OrderBy(specifications.OrderBy);
+            else if (specifications.OrderByDescending is not null)
+                query = query.OrderByDescending(specifications.OrderByDescending);
+
             // query = query.Where(p => p.Id == 5).Include(p => p.ProductBrand).Include(p => p.ProductType);
+
+            // Pagination
+            if(specifications.IsPaginated)
+                query = query.Skip(specifications.Skip).Take(specifications.Take);
 
             return query;
         }

@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Services.Abstractions.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using Shared.Dtos;
 
 namespace E_Commerce.Presentations.Controllers
@@ -9,8 +10,8 @@ namespace E_Commerce.Presentations.Controllers
     public class ProductsController(IServiceManger serviceManger) : ControllerBase
     {
         [HttpGet] // GET: BaseUrl/api/Products
-        public async Task<ActionResult<IEnumerable<ProductResultDto>>> GetAllProducts()
-            => Ok(await serviceManger.ProductService.GetAllProductsAsync());
+        public async Task<ActionResult<PaginatedResult<ProductResultDto>>> GetAllProducts([FromQuery]ProductSpecParams parameters)
+            => Ok(await serviceManger.ProductService.GetAllProductsAsync(parameters));
 
         [HttpGet("Brands")] // GET: BaseUrl/api/Products/Brands
         public async Task<ActionResult<IEnumerable<BrandResultDto>>> GetAllBrands()

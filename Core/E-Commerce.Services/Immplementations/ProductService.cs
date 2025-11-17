@@ -4,6 +4,7 @@ using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Domain.Entities.Products;
 using E_Commerce.Services.Abstractions.Contracts;
 using E_Commerce.Services.Specifications;
+using Shared;
 using Shared.Dtos;
 
 namespace E_Commerce.Services.Immplementations
@@ -39,16 +40,19 @@ namespace E_Commerce.Services.Immplementations
         }
 
         // Get All Products
-        public async Task<IEnumerable<ProductResultDto>> GetAllProductsAsync()
+        public async Task<PaginatedResult<ProductResultDto>> GetAllProductsAsync(ProductSpecParams parameters)
         {
             // 1. Retrive All Products ==> UnitOfWork
-            var products = await _unitOfWork.GetReository<Product, int>().GetAllAsync(new ProductWithBrandAndTypeApecifications());
+            var products = await _unitOfWork.GetReository<Product, int>().GetAllAsync(new ProductWithBrandAndTypeApecifications(parameters));
 
             // 2. Map Entities To Dtos
             var productsResult = _mapper.Map<IEnumerable<ProductResultDto>>(products);
 
+            var pageSize = productsResult.Count();
+            var totalCount = await _unitOfWork.GetReository<Product,int>().CountAsync(new ProductCountSpecifications(parameters));
+
             // 3. Return The Result
-            return productsResult;
+            return new PaginatedResult<ProductResultDto>(parameters.PageIndex, pageSize , totalCount, productsResult);
         }
 
         // Get Product By Id
