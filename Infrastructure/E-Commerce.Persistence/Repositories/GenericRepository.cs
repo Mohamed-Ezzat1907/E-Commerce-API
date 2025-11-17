@@ -33,6 +33,8 @@ namespace E_Commerce.Persistence.Repositories
         public async Task<TEntity?> GetByIdAsync(TKey id)
             => await _dbContext.Set<TEntity>().FindAsync(id);
 
+        #region Specification
+
         // Get All Entities with Specification
         public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, TKey> specification)
             => await ApplySpecifications(specification).ToListAsync();
@@ -40,6 +42,16 @@ namespace E_Commerce.Persistence.Repositories
         // Get Single Entity with Specification
         public async Task<TEntity?> GetByIdAsync(ISpecifications<TEntity, TKey> specification)
             => await ApplySpecifications(specification).FirstOrDefaultAsync();
+
+        #endregion
+
+        #region Pagination
+
+        // Get Paginated Entities with Specification
+        public async Task<int> CountAsync(ISpecifications<TEntity,TKey> specifications)
+            => await ApplySpecifications(specifications).CountAsync();
+
+        #endregion
 
 
         // Add New Entity

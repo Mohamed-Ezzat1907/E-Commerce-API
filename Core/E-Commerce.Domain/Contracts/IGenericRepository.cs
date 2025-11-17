@@ -20,6 +20,12 @@ namespace E_Commerce.Domain.Contracts
 
         #endregion
 
+        #region Pagination
+
+        Task<int> CountAsync(ISpecifications<TEntity,TKey> specifications);
+
+        #endregion
+
         // Add New Entity
         Task AddAsync(TEntity entity);
 
