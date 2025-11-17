@@ -20,7 +20,7 @@ namespace E_Commerce.Presentations.Controllers
         public async Task<ActionResult<IEnumerable<TypeResultDto>>> GetAllTypes()
             => Ok(await serviceManger.ProductService.GetAllTypesAsync());
 
-        [HttpGet("{id : int}")] // GET: BaseUrl/api/Products/{id}
+        [HttpGet("{id:int}")] // GET: BaseUrl/api/Products/{id}
         public async Task<ActionResult<ProductResultDto>> GetProductById(int id)
             => Ok(await serviceManger.ProductService.GetProductByIdAsync(id));
     }
