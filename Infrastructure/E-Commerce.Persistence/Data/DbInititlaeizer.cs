@@ -33,7 +33,7 @@ namespace E_Commerce.Persistence.Data
                 // Apply any pending migrations
                 // Create Database if it does not exist & Apply Any Pending Migrations
                 if (_dbContext.Database.GetPendingMigrations().Any())
-                    await _dbContext.Database.MigrateAsync();
+                       await _dbContext.Database.MigrateAsync();
 
                 // Seed Initial Data
                 // 1. Seed Product Brands

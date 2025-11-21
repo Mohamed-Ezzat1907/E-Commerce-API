@@ -4,6 +4,8 @@ using E_Commerce.Persistence.Data;
 using E_Commerce.Persistence.Data.DBContexts;
 using E_Commerce.Persistence.Repositories;
 using E_Commerce.Services;
+using E_Commerce.Services.Abstractions.Contracts;
+using E_Commerce.Services.Immplementations;
 using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce.Api
@@ -21,13 +23,16 @@ namespace E_Commerce.Api
             builder.Services.AddControllers();
             builder.Services.AddScoped<IDbInititlaeizer, DbInititlaeizer>();
             builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
+            builder.Services.AddScoped<IServiceManger, ServiceManger>();
             builder.Services.AddAutoMapper(o => { } , typeof(AssemblyReference).Assembly);
             builder.Services.AddDbContext<StoreDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi(); 
+            builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             #endregion
 
@@ -40,10 +45,13 @@ namespace E_Commerce.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseAuthorization();
 
