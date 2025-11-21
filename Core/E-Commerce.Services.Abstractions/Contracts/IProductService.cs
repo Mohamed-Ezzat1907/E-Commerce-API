@@ -1,10 +1,11 @@
-﻿using Shared.Dtos;
+﻿using Shared;
+using Shared.Dtos;
 
 namespace E_Commerce.Services.Abstractions.Contracts
 {
     public interface IProductService
     {
-        Task<IEnumerable<ProductResultDto>> GetAllProductsAsync();
+        Task<PaginatedResult<ProductResultDto>> GetAllProductsAsync(ProductSpecParams parameters);
 
         Task<ProductResultDto> GetProductByIdAsync(int id);
 
