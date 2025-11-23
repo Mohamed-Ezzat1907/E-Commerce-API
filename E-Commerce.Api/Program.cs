@@ -1,4 +1,7 @@
 
+using E_Commerce.Api.Extensions;
+using E_Commerce.Api.Factories;
+using E_Commerce.Api.Middlewares;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Persistence.Data;
 using E_Commerce.Persistence.Data.DBContexts;
@@ -6,6 +9,7 @@ using E_Commerce.Persistence.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Abstractions.Contracts;
 using E_Commerce.Services.Immplementations;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce.Api
@@ -20,33 +24,30 @@ namespace E_Commerce.Api
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
-            builder.Services.AddScoped<IDbInititlaeizer, DbInititlaeizer>();
-            builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
-            builder.Services.AddScoped<IServiceManger, ServiceManger>();
-            builder.Services.AddAutoMapper(o => { } , typeof(AssemblyReference).Assembly);
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // WebApis Services 
+            builder.Services.AddWebApisServices();
+
+            // Infrastructure Services
+            builder.Services.AddInfrastrcutureServices(builder.Configuration);
+
+            // Core Services
+            builder.Services.AddCoreServices();
 
             #endregion
 
             var app = builder.Build();
 
-            await InitializeDbAsync(app);
-
             #region Middle Wares
 
             // Configure the HTTP request pipeline.
+
+            app.UseCustomExceptionMiddleware();
+
+            await app.SeedDbAsync();
+
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddleware();
             }
 
             app.UseHttpsRedirection();
@@ -61,18 +62,6 @@ namespace E_Commerce.Api
             #endregion
 
             app.Run();
-
-            #region Methods
-
-            async Task InitializeDbAsync(WebApplication app) 
-            {
-                // Create Object From Type That Implement IDbInititlaeizer
-                using var scope = app.Services.CreateScope();
-                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInititlaeizer>();
-                await dbInitializer.InitializeAsync();
-            }
-
-            #endregion
         }
     }
 }

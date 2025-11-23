@@ -1,5 +1,5 @@
 ﻿using Shared;
-using Shared.Dtos;
+using Shared.Dtos.ProductDTOs;
 
 namespace E_Commerce.Services.Abstractions.Contracts
 {

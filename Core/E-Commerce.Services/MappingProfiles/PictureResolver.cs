@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Entities.ProductModule;
 using Microsoft.Extensions.Configuration;
-using Shared.Dtos;
+using Shared.Dtos.ProductDTOs;
 
 namespace E_Commerce.Services.MappingProfiles
 {
