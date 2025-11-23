@@ -1,4 +1,4 @@
-﻿namespace Shared.Dtos
+﻿namespace Shared.Dtos.ProductDTOs
 {
     // Record Special Type Was Introduced in C# 9 to represent Immutable Data Transfer Objects (DTOs) with built-in value-based equality.
     public record ProductResultDto

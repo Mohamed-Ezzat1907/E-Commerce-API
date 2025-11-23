@@ -2,10 +2,11 @@
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Domain.Entities.Products;
+using E_Commerce.Domain.Exceptions;
 using E_Commerce.Services.Abstractions.Contracts;
 using E_Commerce.Services.Specifications;
 using Shared;
-using Shared.Dtos;
+using Shared.Dtos.ProductDTOs;
 
 namespace E_Commerce.Services.Immplementations
 {
@@ -61,11 +62,8 @@ namespace E_Commerce.Services.Immplementations
             // 1. Retrive The Product By Id ==> UnitOfWork
             var product = await _unitOfWork.GetReository<Product , int>().GetByIdAsync(new ProductWithBrandAndTypeApecifications(id));
 
-            // 2. Map Entity To Dto
-            var productResult = _mapper.Map<ProductResultDto>(product);
-
             // 3. Return The Result
-            return productResult;
+            return product is null ? throw new ProductNotFoundException(id) : _mapper.Map<ProductResultDto>(product);
         }
 
         #endregion
