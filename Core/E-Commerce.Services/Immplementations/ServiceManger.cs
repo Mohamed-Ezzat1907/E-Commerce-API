@@ -1,10 +1,18 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Contracts;
+using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Services.Abstractions.Contracts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using Shared;
 
 namespace E_Commerce.Services.Immplementations
 {
-    public class ServiceManger(IUnitOfWork _unitOfWork , IBasketRepository basketRepository , IMapper _mapper) : IServiceManger
+    public class ServiceManger(IUnitOfWork _unitOfWork ,
+        IBasketRepository basketRepository , 
+        IMapper _mapper , 
+        UserManager<User> userManager,
+        IOptions<JwtOptions> options) : IServiceManger
     {
         #region Fields
 
@@ -14,13 +22,18 @@ namespace E_Commerce.Services.Immplementations
         private readonly Lazy<IBasketService> _basketService
             = new Lazy<IBasketService>(() => new BasketService(basketRepository, _mapper));
 
+        private readonly Lazy<IAuthenticationService> _authenticationService
+            = new Lazy<IAuthenticationService>(() => new AuthenticationService(userManager , options));
+
         #endregion
 
         #region Properties
 
         public IProductService ProductService => _productService.Value;
 
-        public IBasketService BasketService => _basketService.Value;  
+        public IBasketService BasketService => _basketService.Value;
+
+        public IAuthenticationService AuthenticationService => _authenticationService.Value;
 
         #endregion
     }

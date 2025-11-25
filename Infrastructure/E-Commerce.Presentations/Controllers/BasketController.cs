@@ -1,4 +1,5 @@
 ﻿using E_Commerce.Services.Abstractions.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Dtos.BasketDTOs;
@@ -6,6 +7,7 @@ using Shared.Dtos.ProductDTOs;
 
 namespace E_Commerce.Presentations.Controllers
 {
+    [Authorize]
     public class BasketController(IServiceManger serviceManger) : ApiControllerBase
     {
         [ProducesResponseType(typeof(BasketDTO), StatusCodes.Status200OK)]

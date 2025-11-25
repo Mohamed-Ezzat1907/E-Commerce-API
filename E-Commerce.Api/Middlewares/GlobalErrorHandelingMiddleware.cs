@@ -1,5 +1,4 @@
 ﻿using E_Commerce.Domain.Exceptions;
-using Microsoft.AspNetCore.Http;
 using Shared.ErrorModels;
 using System.Net;
 
@@ -40,24 +39,24 @@ namespace E_Commerce.Api.Middlewares
             // Set The Response Content Type
             httpContext.Response.ContentType = "application/json";
 
+            // Return The Standard Error Response   C# object
+            var response = new ErrorDetails
+            {
+                ErrorMessage = exception.Message,
+            };
+
             // Set The Response Status Code
-            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             httpContext.Response.StatusCode = exception switch
             {
-                UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-                ArgumentNullException => (int)HttpStatusCode.BadRequest,
                NotFoundException => (int)HttpStatusCode.NotFound,
+               UnAuthorizedException => StatusCodes.Status401Unauthorized,
+               ValidationException validationException => HandelValidationException(validationException,response),
                 _ => (int)HttpStatusCode.InternalServerError
             };
 
-            // Return The Standard Error Response   C# obhect
-            var response = new ErrorDetails
-            {
-                StatusCode = httpContext.Response.StatusCode,
-                ErrorMessage = exception.Message,
-            }.ToString();
+            response.StatusCode = httpContext.Response.StatusCode;
 
-            await httpContext.Response.WriteAsync(response);
+            await httpContext.Response.WriteAsync(response.ToString());
             //await httpContext.Response.WriteAsJsonAsync(response);
         }
 
@@ -72,6 +71,13 @@ namespace E_Commerce.Api.Middlewares
             }.ToString();
 
             await httpContext.Response.WriteAsync(response);
+        }
+
+        // Handle Validation Exceptions
+        private int HandelValidationException(ValidationException validationException , ErrorDetails reponse)
+        {
+            reponse.Errors =validationException.Errors;
+            return StatusCodes.Status400BadRequest;
         }
     }
 }
