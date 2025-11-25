@@ -1,7 +1,9 @@
 ﻿using E_Commerce.Domain.Contracts;
+using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Domain.Entities.Products;
 using E_Commerce.Persistence.Data.DBContexts;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -12,14 +14,18 @@ namespace E_Commerce.Persistence.Data
         #region Field
 
         private readonly StoreDbContext _dbContext;
+        private readonly UserManager<User> _userManger;
+        private readonly RoleManager<IdentityRole> _roleManger;
 
         #endregion
 
         #region Constructor
 
-        public DbInititlaeizer(StoreDbContext dbContext)
+        public DbInititlaeizer(StoreDbContext dbContext , RoleManager<IdentityRole> roleManger , UserManager<User> userManager)
         {
             _dbContext = dbContext;
+            _roleManger = roleManger;
+            _userManger = userManager;
         }
 
         #endregion
@@ -84,7 +90,47 @@ namespace E_Commerce.Persistence.Data
             {
                 throw;
             }
-        } 
+        }
+
+        public async Task InitializeIdentityAsync()
+        {
+            // Set Default Roles & Users
+            // Seed Roles
+            if (!_roleManger.Roles.Any()) 
+            {
+                // Create Admin Role
+                await _roleManger.CreateAsync(new IdentityRole("Admin"));
+                // Create Suber Admin Role
+                await _roleManger.CreateAsync(new IdentityRole("SuperAdmin"));
+            }
+
+            // Seed Users
+            if (!_userManger.Users.Any())
+            {
+                var adminUser = new User() 
+                {
+                    DisplayName = "Admin",
+                    Email = "Admin@gmail.com",
+                    UserName = "Admin",
+                    PhoneNumber = "01148231817",
+                };
+
+                var superAdminUser = new User()
+                {
+                    DisplayName = "Super Admin",
+                    Email = "SuperAdmin@gmail.com",
+                    UserName = "SuperAdmin",
+                    PhoneNumber = "0123456789",
+                };
+
+                await _userManger.CreateAsync(adminUser, "Admin@123");
+                await _userManger.CreateAsync(superAdminUser, "SuberAdmin@123");
+
+                // Assign Roles to Users
+                await _userManger.AddToRoleAsync(adminUser, "Admin");
+                await _userManger.AddToRoleAsync(superAdminUser, "SuperAdmin");
+            }
+        }
 
         #endregion
     }

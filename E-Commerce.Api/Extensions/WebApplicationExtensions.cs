@@ -12,6 +12,8 @@ namespace E_Commerce.Api.Extensions
             var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInititlaeizer>();
             await dbInitializer.InitializeAsync();
 
+            await dbInitializer.InitializeIdentityAsync();
+
             return app;
         }
 
