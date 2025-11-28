@@ -23,7 +23,10 @@ namespace E_Commerce.Services.Immplementations
             = new Lazy<IBasketService>(() => new BasketService(basketRepository, _mapper));
 
         private readonly Lazy<IAuthenticationService> _authenticationService
-            = new Lazy<IAuthenticationService>(() => new AuthenticationService(userManager , options));
+            = new Lazy<IAuthenticationService>(() => new AuthenticationService(userManager , options , _mapper));
+
+        private readonly Lazy<IOrderService> _orderService
+            = new Lazy<IOrderService>(() => new OrderService(_mapper, basketRepository, _unitOfWork));
 
         #endregion
 
@@ -34,6 +37,8 @@ namespace E_Commerce.Services.Immplementations
         public IBasketService BasketService => _basketService.Value;
 
         public IAuthenticationService AuthenticationService => _authenticationService.Value;
+
+        public IOrderService OrderService => _orderService.Value;
 
         #endregion
     }

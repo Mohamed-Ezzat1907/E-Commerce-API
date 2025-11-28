@@ -1,4 +1,5 @@
-﻿using E_Commerce.Domain.Entities.ProductModule;
+﻿using E_Commerce.Domain.Entities.OrderAggregate;
+using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Domain.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -31,6 +32,8 @@ namespace E_Commerce.Persistence.Data.DBContexts
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
+
+        public DbSet<DeliveryMethod> DeliveryMethod { get; set; }
 
         #endregion
     }

@@ -56,7 +56,8 @@ namespace E_Commerce.Persistence.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Addresses", (string)null);
                 });
@@ -266,8 +267,8 @@ namespace E_Commerce.Persistence.Identity.Migrations
             modelBuilder.Entity("E_Commerce.Domain.Entities.IdentityModule.Address", b =>
                 {
                     b.HasOne("E_Commerce.Domain.Entities.IdentityModule.User", "User")
-                        .WithMany("Address")
-                        .HasForeignKey("UserId")
+                        .WithOne("Address")
+                        .HasForeignKey("E_Commerce.Domain.Entities.IdentityModule.Address", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -327,7 +328,8 @@ namespace E_Commerce.Persistence.Identity.Migrations
 
             modelBuilder.Entity("E_Commerce.Domain.Entities.IdentityModule.User", b =>
                 {
-                    b.Navigation("Address");
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

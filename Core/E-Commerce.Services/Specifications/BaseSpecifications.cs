@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace E_Commerce.Services.Specifications
 {
-    internal abstract class BaseSpecifications<TEntity, TKey> 
+    public abstract class BaseSpecifications<TEntity, TKey> 
         : ISpecifications<TEntity, TKey> where TEntity : BaseEntity<TKey>
     {
         #region Criteria
