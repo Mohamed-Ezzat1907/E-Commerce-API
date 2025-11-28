@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.IdentityModule;
+using E_Commerce.Domain.Entities.OrderAggregate;
 using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Domain.Entities.Products;
 using E_Commerce.Persistence.Data.DBContexts;
@@ -83,6 +84,21 @@ namespace E_Commerce.Persistence.Data
                     if (products != null && products.Any())
                         await _dbContext.Products.AddRangeAsync(products);
                 }
+
+                // 4. Seed Delivery Methods
+                if (!_dbContext.DeliveryMethod.Any())
+                {
+                    // Read Data from Json File and Deserialize
+                    var deliveryMethodsData = await File.ReadAllTextAsync(@"..\Infrastructure\E-Commerce.Persistence\Data\Seedings\delivery.json");
+
+                    // Transform Json Data to C# Object
+                    var deliveryMethod = JsonSerializer.Deserialize<List<DeliveryMethod>>(deliveryMethodsData);
+
+                    // Add Data to Database & Save Changes
+                    if (deliveryMethod != null && deliveryMethod.Any())
+                        await _dbContext.DeliveryMethod.AddRangeAsync(deliveryMethod);
+                }
+
                 // Save All Changes to Database
                 await _dbContext.SaveChangesAsync();
             }

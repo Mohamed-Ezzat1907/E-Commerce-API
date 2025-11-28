@@ -9,12 +9,9 @@ namespace E_Commerce.Persistence.Identity
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             builder.Entity<Address>()
-                   .ToTable("Addresses")
-                   .HasOne(a => a.User)
-                   .WithMany(u => u.Address)
-                   .HasForeignKey(a => a.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .ToTable("Addresses");
         }
     }
 }

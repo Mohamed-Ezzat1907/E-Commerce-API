@@ -1,19 +1,29 @@
-﻿using E_Commerce.Domain.Entities.IdentityModule;
+﻿using AutoMapper;
+using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Domain.Exceptions;
 using E_Commerce.Services.Abstractions.Contracts;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shared;
 using Shared.Dtos.IdentityDTOs;
+using Shared.Dtos.OrderDTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using UserAddress = E_Commerce.Domain.Entities.IdentityModule.Address;
 
 namespace E_Commerce.Services.Immplementations
 {
-    internal class AuthenticationService(UserManager<User> _userManger ,IOptions<JwtOptions> _optionss) : IAuthenticationService
+    internal class AuthenticationService(
+        UserManager<User> _userManger,
+        IOptions<JwtOptions> _optionss,
+        IMapper mapper) : IAuthenticationService
     {
+
+        #region Mesthods
+
         // Login existing users
         public async Task<UserResultDTO> LoginAsync(LoginDTO loginDTO)
         {
@@ -39,20 +49,20 @@ namespace E_Commerce.Services.Immplementations
         // Register a new users
         public async Task<UserResultDTO> RegisterAsync(RegisterDTO registerDTO)
         {
-           var user = new User
-           {
-               DisplayName = registerDTO.DisplayName,
-               Email = registerDTO.Email,
-               UserName = registerDTO.UserName,
-               PhoneNumber = registerDTO.PhoneNumber
-           };
+            var user = new User
+            {
+                DisplayName = registerDTO.DisplayName,
+                Email = registerDTO.Email,
+                UserName = registerDTO.UserName,
+                PhoneNumber = registerDTO.PhoneNumber
+            };
             var result = await _userManger.CreateAsync(user, registerDTO.Password);
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description).ToList();
+                var errors = result.Errors.Select(e => $"{e.Code}: {e.Description}").ToList();
                 throw new ValidationException(errors);
             }
-                
+
             return new UserResultDTO
             (
                 user.DisplayName,
@@ -60,6 +70,61 @@ namespace E_Commerce.Services.Immplementations
                 await CreateTokenAsync(user)
             );
         }
+
+        // Check if email exists
+        public Task<bool> CheckEmailExistsAsync(string email)
+        {
+            var user = _userManger.FindByEmailAsync(email);
+            return user != null ? Task.FromResult(true) : Task.FromResult(false);
+        }
+
+        public async Task<AddressDTO> GetUserAddressAsync(string email)
+        {
+            var user = await _userManger.Users.Include(u => u.Address)
+                                              .FirstOrDefaultAsync(u => u.Email == email)
+                                              ?? throw new UserNotFoundException(email);
+            return mapper.Map<AddressDTO>(user.Address);
+        }
+
+        public async Task<UserResultDTO> GetUserByEmailAsync(string email)
+        {
+            var user = _userManger.FindByEmailAsync(email) ??
+                         throw new UserNotFoundException(email);
+
+            return new UserResultDTO
+                (
+                   user.Result.DisplayName,
+                   user.Result.Email!,
+                   await  CreateTokenAsync(user.Result)
+                );
+        }
+
+        public async Task<AddressDTO> UpdateUserAddressAsync(AddressDTO address, string email)
+        {
+           var user = await _userManger.Users.Include(u => u.Address)
+                                             .FirstOrDefaultAsync(u => u.Email == email)
+                                             ?? throw new UserNotFoundException(email);
+
+            // User.Address ==> null ==> Create new Address
+            // User.Address ==> Update Address
+            if (user.Address != null) // Update
+            {
+                user.Address.FirstName = address.FristName;
+                user.Address.LastName = address.LastName;
+                user.Address.Street = address.Street;
+                user.Address.City = address.City;
+                user.Address.Country = address.Country;
+            }
+            var userAddress = mapper.Map<UserAddress>(address);
+            user.Address = userAddress;
+
+            await _userManger.UpdateAsync(user);
+            return mapper.Map<AddressDTO>(user.Address);
+        } 
+
+        #endregion
+
+        #region Helper Methods
 
         // Create JWT Token
         private async Task<string> CreateTokenAsync(User user)
@@ -70,12 +135,13 @@ namespace E_Commerce.Services.Immplementations
             // Name , Email , Roles[M-M]
             var claims = new List<Claim>
             {
+                 new Claim(ClaimTypes.NameIdentifier , user.Id),
                 new Claim(ClaimTypes.Name , user.DisplayName),
                 new Claim(ClaimTypes.Email , user.Email),
             };
             var roles = await _userManger.GetRolesAsync(user);
             foreach (var role in roles)
-                claims.Add(new Claim(ClaimTypes.Role,role));
+                claims.Add(new Claim(ClaimTypes.Role, role));
 
             // Secret Key ===> SymmetricSecurityKey
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey));
@@ -92,7 +158,9 @@ namespace E_Commerce.Services.Immplementations
 
             // WriteToken [Object Member Method] ===> JwtSecurityTokenHandler
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+        } 
+
+        #endregion
     }
 }
 
