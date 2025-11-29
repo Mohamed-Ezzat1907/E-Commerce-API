@@ -54,6 +54,8 @@ namespace E_Commerce.Api
 
             app.UseStaticFiles();
 
+            app.UseCors("CORSPoleicy");
+
             app.UseAuthorization();
 
             app.UseAuthorization();

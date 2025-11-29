@@ -14,13 +14,15 @@ namespace E_Commerce.Domain.Entities.OrderAggregate
             ShippingAdress shippingAdress,
             ICollection<OrderItem> orderItems,
             DeliveryMethod deliveryMethod, 
-            decimal subtotal)
+            decimal subtotal,
+            string paymentIntentId)
         {
             UserEmail = userEmail;
             ShippingAdress = shippingAdress;
             OrderItems = orderItems;
             DeliveryMethod = deliveryMethod;
             Subtotal = subtotal;
+            PaymentIntentId = paymentIntentId;
         }
 
         #endregion
@@ -38,7 +40,7 @@ namespace E_Commerce.Domain.Entities.OrderAggregate
 
         // Subtotal = Sum(OrderItem.price * OrderItem.quantity)
         public decimal Subtotal { get; set; }
-        public string PaymentIntentId { get; set; } = string.Empty;
+        public string PaymentIntentId { get; set; } 
 
         public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
 

@@ -7,7 +7,7 @@
         public AddressDTO ShippingAdress { get; init; }
         public ICollection<OrderItemDTO> OrderItems { get; init; } = new List<OrderItemDTO>();
 
-        public string PaymentStatus { get; init; } = string.Empty;
+        public string Status { get; init; } = string.Empty;
         public string DeliveryMethod { get; init; } = string.Empty;
 
         public int? DeliveryMethodID { get; init; }
