@@ -3,6 +3,7 @@ using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Services.Abstractions.Contracts;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Shared;
 
@@ -12,7 +13,8 @@ namespace E_Commerce.Services.Immplementations
         IBasketRepository basketRepository , 
         IMapper _mapper , 
         UserManager<User> userManager,
-        IOptions<JwtOptions> options) : IServiceManger
+        IOptions<JwtOptions> options,
+        IConfiguration configuration) : IServiceManger
     {
         #region Fields
 
@@ -28,6 +30,9 @@ namespace E_Commerce.Services.Immplementations
         private readonly Lazy<IOrderService> _orderService
             = new Lazy<IOrderService>(() => new OrderService(_mapper, basketRepository, _unitOfWork));
 
+        private readonly Lazy<IPaymentService> _paymentService =
+            new Lazy<IPaymentService>(() => new PaymentService(configuration , basketRepository , _mapper, _unitOfWork ));
+
         #endregion
 
         #region Properties
@@ -39,6 +44,8 @@ namespace E_Commerce.Services.Immplementations
         public IAuthenticationService AuthenticationService => _authenticationService.Value;
 
         public IOrderService OrderService => _orderService.Value;
+
+        public IPaymentService PaymentService => _paymentService.Value;
 
         #endregion
     }

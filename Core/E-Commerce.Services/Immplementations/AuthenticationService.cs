@@ -78,6 +78,7 @@ namespace E_Commerce.Services.Immplementations
             return user != null ? Task.FromResult(true) : Task.FromResult(false);
         }
 
+        // Get User Address By Email
         public async Task<AddressDTO> GetUserAddressAsync(string email)
         {
             var user = await _userManger.Users.Include(u => u.Address)
@@ -86,6 +87,7 @@ namespace E_Commerce.Services.Immplementations
             return mapper.Map<AddressDTO>(user.Address);
         }
 
+        // Get User By Email
         public async Task<UserResultDTO> GetUserByEmailAsync(string email)
         {
             var user = _userManger.FindByEmailAsync(email) ??
@@ -99,6 +101,7 @@ namespace E_Commerce.Services.Immplementations
                 );
         }
 
+        //Update User Address
         public async Task<AddressDTO> UpdateUserAddressAsync(AddressDTO address, string email)
         {
            var user = await _userManger.Users.Include(u => u.Address)

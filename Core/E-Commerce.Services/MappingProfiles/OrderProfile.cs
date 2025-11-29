@@ -11,7 +11,8 @@ namespace E_Commerce.Services.MappingProfiles
         {
             CreateMap<ShippingAddress , AddressDTO>().ReverseMap();
 
-            CreateMap<DeliveryMethod, DeliveryMethodResult>();
+            CreateMap<DeliveryMethod, DeliveryMethodResult>()
+                .ForMember(d => d.Cost, options => options.MapFrom(s => s.Price));
 
             CreateMap<OrderItem, OrderItemDTO>()
                 .ForMember(d => d.ProductId, options => options.MapFrom(s => s.Product.ProductId))
@@ -20,7 +21,7 @@ namespace E_Commerce.Services.MappingProfiles
                 .ForMember(d => d.PictureUrl, options => options.MapFrom<OrderPictureResolver>());
 
             CreateMap<Order, OrderResult>().
-                ForMember(d => d.PaymentStatus, options => options.MapFrom(s => s.PaymentStatus))
+                ForMember(d => d.Status, options => options.MapFrom(s => s.PaymentStatus.ToString()))
                 .ForMember(d => d.DeliveryMethod, options => options.MapFrom(s => s.DeliveryMethod.ShortName))
                 .ForMember(d => d.Total , options => options.MapFrom(s => s.Subtotal + s.DeliveryMethod.Price));
         }

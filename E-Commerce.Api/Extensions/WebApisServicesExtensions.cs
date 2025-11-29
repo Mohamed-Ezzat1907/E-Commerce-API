@@ -19,6 +19,14 @@ namespace E_Commerce.Api.Extensions
 
             services.ConfigureSwagger();
 
+            services.AddCors(configure => 
+            {
+                configure.AddPolicy("CORSPoleicy", options => 
+                {
+                    options.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:64899");
+                });
+            });
+
             return services;
         }
 

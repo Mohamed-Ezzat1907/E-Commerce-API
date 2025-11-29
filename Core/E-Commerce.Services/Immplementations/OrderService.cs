@@ -20,7 +20,7 @@ namespace E_Commerce.Services.Immplementations
         public async Task<OrderResult> CreateOrderAsync(OrderRequest orderRequest, string userEmail)
         {
             // 1. Shipping Address
-            var address = mapper.Map<ShippingAddress>(orderRequest.ShippingAddress);
+            var address = mapper.Map<ShippingAddress>(orderRequest.ShipToAddress);
 
             // 2. Order Items ==> From BasketId ==> BasketItemts ==> Product Details
             var basket = await basketRepository.GetBasketAsync(orderRequest.BasketId);
@@ -36,15 +36,22 @@ namespace E_Commerce.Services.Immplementations
             var deliveryMethod = await unitOfWork.GetReository<DeliveryMethod, int>()
                 .GetByIdAsync(orderRequest.DeliveryMethodId) ?? throw new DeliveryMethodException(orderRequest.DeliveryMethodId);
 
-            // 4. Subtotal ==> Sum of OrderItems Price * Quantity
+            // 4. check if order with this paymentIntentId exists
+            var orderRepo = unitOfWork.GetReository<Order , Guid>();
+            var existingOrder = await orderRepo.GetByIdAsync(new OrderWithPaymentIntentIdSpecifications(basket.PaymentIntentId!));  
+
+            if (existingOrder is not null)
+                orderRepo.Delete(existingOrder);
+
+            // 5. Subtotal ==> Sum of OrderItems Price * Quantity
             var subTotal = orderItems.Sum(item => item.Price * item.Quantity);
 
-            // 5. create Order and save to DB
-            var order = new Order(userEmail, address, orderItems, deliveryMethod, subTotal);
-            await unitOfWork.GetReository<Order , Guid>().AddAsync(order);
+            // 6. create Order and save to DB
+            var order = new Order(userEmail, address, orderItems, deliveryMethod, subTotal , basket.PaymentIntentId!);
+            await orderRepo.AddAsync(order);
             await unitOfWork.SaveChangesAsync();
 
-            // 6. return OrderResult
+            // 7. return OrderResult
             return mapper.Map<OrderResult>(order);
         }
 

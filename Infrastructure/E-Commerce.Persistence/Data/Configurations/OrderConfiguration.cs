@@ -11,7 +11,8 @@ namespace E_Commerce.Persistence.Data.Configurations
             builder.OwnsOne(o => o.ShippingAdress, address => address.WithOwner()); // 1=1 relationship
 
             builder.HasMany(o => o.OrderItems)
-                   .WithOne(); // 1=* relationship
+                   .WithOne()
+                   .OnDelete(DeleteBehavior.Cascade); // 1=* relationship
 
             builder.Property(o => o.PaymentStatus)
                    .HasConversion
