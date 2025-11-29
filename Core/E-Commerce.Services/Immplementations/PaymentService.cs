@@ -22,7 +22,6 @@ namespace E_Commerce.Services.Immplementations
     // 7- Create Or Update PaymentIntent [If No PaymentIntentId Create New One, If Exists Update It]
     // 8- Save PaymentIntentId And ClientSecret To Basket And Update Basket In Repo
     // 10- Return The Updated BasketDTO
-
     internal class PaymentService(
         IConfiguration configuration,
         IBasketRepository basketRepository,
@@ -112,10 +111,10 @@ namespace E_Commerce.Services.Immplementations
             switch (stripeEvent.Type)
             {
                 case EventTypes.PaymentIntentSucceeded:
-                    await UpdatePaymentIntentSucceeded(paymentIntent.Id);
+                    await UpdatePaymentIntentSucceeded(paymentIntent!.Id);
                     break;
                 case EventTypes.PaymentIntentPaymentFailed:
-                    await UpdatePaymentIntentFailed(paymentIntent.Id);
+                    await UpdatePaymentIntentFailed(paymentIntent!.Id);
                      break;
                 default:
                     // Unexpected event type
